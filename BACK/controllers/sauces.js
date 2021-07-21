@@ -1,5 +1,6 @@
 const Sauce = require('../models/sauce');
 const fs = require('fs'); // donne accès au systeme de modification du systeme de fichier
+const { ESTALE } = require('constants');
 
 // POST
 exports.createSauce = (req, res, next) => {
@@ -27,19 +28,98 @@ exports.getOneSauce = (req, res, next) => {
 };
 
 // PUT modifier une sauce
-
 exports.updateOneSauce = (req, res, next) => {
-	const sauceObject = req.file // si req.file l'image a été modifiée dans la requete
+	// si req.file l'image a été modifiée dans la requete
+	const sauceObject = req.file
 		? {
 				...JSON.parse(req.body.sauce),
-				imageUrl: `${req.protocol}://$req.get('host')/images/${res.file.filename}`,
+				imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
 		  }
 		: { ...req.body };
 
-	Sauce.updateOne({ _id: req.params.id }, { ...sauceObject }) //met à jour le premier parametre
-		.then(() => res.status(200).json({ message: 'Sauce modifiée avec succès' }))
-		.cactht((error) => res.status(400).json({ error }));
+	Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id }) //met à jour le premier parametre
+		.then(() => res.status(200).json({ message: 'Sauce modifiée' }))
+		.catch((error) => res.status(400).json({ error }));
 };
+
+//POST J'AIME
+
+//pb de compteur connection deconnection
+//BUG USER, IL ENREGISTRE DES DONNÉES MULTIPLES AVEC LE MÊME COMPTE (NE SAUVEGARDE PAS MES CHOIX APRÈS DÉCONNECTION) + VALEUR NÉGATIVE
+//factoriser et voir comment empecher de liker et disliker une sauce
+exports.likeOneSauce = (req, res, next) => {
+	const like = req.body.like;
+	const userId = req.body.userId; //
+	const sauceId = req.params.id;
+	//recupère id de la sauce et check si user id deja liké
+	Sauce.findOne({ _id: sauceId }).then((sauce) => {
+		//si utilisateur n'a pas dejà liké et si like =1
+		if (!sauce.usersLiked.includes(userId) && like === 1) {
+			Sauce.updateOne(
+				{ _id: sauceId },
+				{ $inc: { likes: +1 }, $push: { usersLiked: userId } }
+			)
+				.then(() => res.status(200).json({ message: `like ajouté` }))
+				.catch((error) => res.status(400).json({ error }));
+		}
+		//retirer un j'aime
+		else if (sauce.usersLiked.includes(userId) && like === 0) {
+			Sauce.updateOne(
+				{ _id: sauceId },
+				{ $inc: { likes: -1 }, $pull: { usersLiked: userId } }
+			)
+				.then(() => res.status(200).json({ message: `like retiré` }))
+				.catch((error) => res.status(400).json({ error }));
+		}
+		//disliker
+		else if (!sauce.usersDisliked.includes(userId) && like === -1) {
+			Sauce.updateOne(
+				{ _id: sauceId },
+				{ $inc: { dislikes: +1 }, $push: { usersDisliked: userId } }
+			)
+				.then(() => res.status(200).json({ message: `dislike ajouté` }))
+				.catch((error) => res.status(400).json({ error }));
+		}
+		//reiter un dislike
+		else if (sauce.usersDisliked.includes(userId) && like === 0) {
+			Sauce.updateOne(
+				{ _id: sauceId },
+				{ $inc: { dislikes: -1 }, $pull: { usersDisliked: userId } }
+			)
+				.then(() => res.status(200).json({ message: `dislike retiré` }))
+				.catch((error) => res.status(400).json({ error }));
+		}
+	}); //end of findOne=> .then
+};
+//  .catch((error) => res.status(400).json({ error }))
+
+//MANQUE FONDoNE =>SAUCE ID COMPARE USER AVEC INCLUDE, VOIRE POUR SWITCH
+// Sauce.updateOne({ _id: req.params.id }, { $inc: { likes: like ,  dislikes: like} });
+// if (like === 1) {
+// 	Sauce.updateOne({ _id: sauceId }, { $inc: { likes: like }, $push: { usersLiked: userId } })
+
+// 		.then(() => res.status(200).json({ message: `like ajouté` }))
+// 		.catch((error) => res.status(400).json({ error }));
+// } else if (like === 0) {
+// 		Sauce.updateOne({ _id: sauceId }, { $inc: { likes: -1 }, $pull: { usersLiked: userId } })
+// 			.then(() => res.status(200).json({ message: `like retiré` }))
+// 			.catch((error) => res.status(400).json({ error }));
+// 	} else if (like === -1) {
+// 		Sauce.updateOne(
+// 			{ _id: sauceId },
+// 			{ $inc: { dislikes: +1 }, $pull: { usersDisliked: userId } }
+// 		)
+// 			.then(() => res.status(200).json({ message: `dislike ajouté` }))
+// 			.catch((error) => res.status(400).json({ error }));
+// 	} else if (like === 0) {
+// 		Sauce.updateOne(
+// 			{ _id: sauceId },
+// 			{ $inc: { dislikes: -1 }, $pull: { usersDisliked: userId } }
+// 		)
+// 			.then(() => res.status(200).json({ message: `dislike retiré` }))
+// 			.catch((error) => res.status(400).json({ error }));
+// 	}
+// };
 
 //DELETE
 //s'assurer que les fichiers ses uprime du serveru quand un utilisateur supprime son objet (si supprime de la bbd suprime du serveur et du dossier image)

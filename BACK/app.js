@@ -5,6 +5,7 @@ const fs = require('fs');
 const app = express();
 const bodyParser = require('body-parser');
 const saucesRoutes = require('./routes/sauces');
+const userRoutes = require('./routes/user');
 
 //MONGODB CONNECTION
 const mongoose = require('mongoose'); // instale mongoose
@@ -32,12 +33,12 @@ app.use((req, res, next) => {
 app.use(bodyParser.json()); //traduit les requete en objets utilisables
 
 // ROUTES
-
 app.use('/api/sauces', saucesRoutes);
+app.use('/api/auth', userRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'images'))); // gère les req images.
-app.use((req, res, next) => {
-	res.json('réponse');
-});
+// app.use((req, res, next) => {
+// 	res.json('réponse');
+// });
 
 module.exports = app;
