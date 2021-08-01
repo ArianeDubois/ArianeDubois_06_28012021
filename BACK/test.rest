@@ -1,0 +1,44 @@
+POST http://localhost:3000/api/auth/signup
+Content-Type: application/json 
+
+{
+    "email": "jp",
+    "password": "2"
+}
+
+###
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json 
+
+{
+    "email": "tintin@orange.fr",
+    "password": "tintin"
+} 
+
+###
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json 
+
+{
+    "email": "milou@gmail.com",
+    "password": "milou"
+} 
+
+###
+GET  http://localhost:3000/api/sauces
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MTA3MDFkZDBjYjkwNTIxMTQyZmU4NzEiLCJpYXQiOjE2Mjc4NDkzMzksImV4cCI6MTYyNzkzNTczOX0.LLeU3hHCz6g9qaH8GP5zOaJrRGO0tHSwLShpL__aWbQ
+
+
+###
+PUT http://localhost:3000/api/sauces/61070653a7c2a2219e1f7fb7
+Content-Type: application/json 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MTA2ZGM4ZDc5Njc3YzFiYWJlZTY4YWEiLCJpYXQiOjE2Mjc4NTA5MzMsImV4cCI6MTYyNzkzNzMzM30.4Ij_P-m74P2PeLU3_WypxdIfyh-QUdqxo2NXriw1fQY
+
+{
+      "userId": "6106dc8d79677c1babee68aa",
+       "name": "Canard",
+        "imageUrl": "http://localhost:3000/images/S_t_a_y_C_o_n_n_e_c_t_e_d_-_1_0_2_4_x_3_3_8_._w_e_b_p1627851881824.undefined",
+       "dislikes" : 10,
+       "likes" : 2
+}
+
