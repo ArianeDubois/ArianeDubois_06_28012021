@@ -36,7 +36,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MTA2Z
 
 {
       "userId": "6106dc8d79677c1babee68aa",
-       "name": "Canard",
+       "name": "Planche de surf",
         "imageUrl": "http://localhost:3000/images/S_t_a_y_C_o_n_n_e_c_t_e_d_-_1_0_2_4_x_3_3_8_._w_e_b_p1627851881824.undefined",
        "dislikes" : 10,
        "likes" : 2
